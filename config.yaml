@@ -52,6 +52,12 @@ data_agents_config:
   - agent_name: "hot_money_agent"
     data_source_list: 
       - "data_source.hot_money_akshare.HotMoneyAkshare"
+  - agent_name: "community_sentiment_agent"
+    data_source_list:
+      - "data_source.xueqiu_community_crawl.XueqiuCommunityCrawl"
+      - "data_source.eastmoney_community_crawl.EastmoneyCommunityCrawl"
+    bias_goal: "专注于捕获市场情绪变化、KOL观点分析和投资者行为模式，识别潜在的催化剂事件和情绪拐点"
+    final_target_tokens: 5000
 
 # 研究智能体配置
 research_agent_config:

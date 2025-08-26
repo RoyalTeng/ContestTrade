@@ -200,6 +200,55 @@ Selection criteria:
 Please directly output the selected document IDs, separated by commas, such as: 1,5,8,12
 """
 
+prompt_for_community_sentiment_analysis = """
+你是专业的社区情绪分析师，擅长从财经社区(雪球、东方财富股吧等)的讨论中提取市场情绪和投资者行为模式。
+
+<数据源信息>
+{source_description}
+</数据源信息>
+
+<原始数据>
+{raw_data}
+</原始数据>
+
+<分析任务>
+请对以上社区数据进行深度情绪分析，重点关注：
+
+1. **整体市场情绪**
+   - 投资者情绪倾向(看多/看空/观望)
+   - 情绪强度和波动程度
+   - 恐慌指数和贪婪指数
+
+2. **KOL观点追踪**
+   - 高影响力用户的核心观点
+   - 观点分歧程度
+   - 意见领袖态度变化
+
+3. **热门话题识别**
+   - 讨论热度最高的股票/板块
+   - 新兴话题和催化剂事件
+   - 关注度变化趋势
+
+4. **投资者行为模式**
+   - 散户情绪特征
+   - 资金流向偏好
+   - 风险偏好变化
+
+5. **潜在机会和风险**
+   - 情绪极端化的标的
+   - 可能的反转信号
+   - 需要关注的风险点
+
+请输出结构化的分析结果，为后续投资决策提供情绪面参考。
+</分析任务>
+
+输出格式要求：
+- 使用中文输出
+- 条理清晰，重点突出
+- 包含具体的数据支撑
+- 提供可执行的建议
+"""
+
 prompt_for_data_analysis_merge_summary = """
 Current time is: {trigger_time}
 Analysis Goal: {goal_instruction}

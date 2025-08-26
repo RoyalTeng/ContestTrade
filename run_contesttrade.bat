@@ -1,45 +1,42 @@
 @echo off
-echo ========================================
 echo ContestTrade 启动脚本
-echo ========================================
-echo.
+echo ===================
 
-echo 正在创建conda环境...
-call conda create -n contesttrade python=3.10 -y
+:: 检查 conda 是否可用
+where conda >nul 2>nul
 if %errorlevel% neq 0 (
-    echo 创建环境失败，可能环境已存在，继续...
+    echo 错误：找不到 conda 命令
+    echo 请先运行 install.bat 安装环境
+    pause
+    exit /b 1
 )
 
-echo.
-echo 正在激活conda环境...
+:: 激活环境
+echo 激活 ContestTrade 环境...
 call conda activate contesttrade
 if %errorlevel% neq 0 (
-    echo 激活环境失败，请检查conda安装
+    echo 激活环境失败，请先运行 install.bat
     pause
     exit /b 1
 )
 
-echo.
-echo 正在切换到项目目录...
-cd /d "F:\contsttrade"
+:: 检查配置文件
+if not exist "config.yaml" (
+    echo 错误：找不到 config.yaml 配置文件
+    echo 请复制 config_template.yaml 为 config.yaml 并配置 API 密钥
+    pause
+    exit /b 1
+)
 
+:: 启动项目
+echo 启动 ContestTrade...
 echo.
-echo 正在安装项目依赖...
-pip install -r requirements.txt
+"D:\Users\Administrator\miniconda3\envs\contesttrade\python.exe" -m cli.main run
+
+:: 如果上面的命令失败，尝试直接运行
 if %errorlevel% neq 0 (
-    echo 依赖安装失败，请检查网络连接
-    pause
-    exit /b 1
+    echo 尝试直接运行...
+    "D:\Users\Administrator\miniconda3\envs\contesttrade\python.exe" cli\main.py run
 )
 
-echo.
-echo ========================================
-echo 正在启动ContestTrade系统...
-echo ========================================
-echo.
-
-python -m cli.main run
-
-echo.
-echo 程序已结束
 pause

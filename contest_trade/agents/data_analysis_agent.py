@@ -288,7 +288,18 @@ class DataAnalysisAgent:
         """Merge multiple batch summaries into final document factor"""
         try:
             if not state["batch_results"]:
-                return "No valid document summaries retrieved"
+                # 设置空摘要并返回状态
+                state["summary"] = "No valid document summaries retrieved"
+                state["result"] = DataAnalysisAgentOutput(
+                    agent_name=self.config.agent_name,
+                    trigger_time=state["trigger_time"],
+                    source_list=state["source_list"],
+                    bias_goal=state["bias_goal"],
+                    context_string="No valid document summaries retrieved",
+                    references=[],
+                    batch_summaries=[]
+                )
+                return state
             
             # Merge all batch summaries
             combined_summary = "\n\n".join([

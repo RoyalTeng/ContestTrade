@@ -213,9 +213,30 @@ class FinalReportGenerator:
                 if evidence_list:
                     report_content += f"- **支撑证据** ({len(evidence_list)}项):\n"
                     for j, evidence in enumerate(evidence_list, 1):
-                        desc = evidence.get('description', 'N/A')
-                        source = evidence.get('from_source', 'N/A')
-                        time = evidence.get('time', 'N/A')
+                        # 处理不同格式的证据数据
+                        if isinstance(evidence, dict):
+                            desc = evidence.get('description', 'N/A')
+                            source = evidence.get('from_source', 'N/A')
+                            time = evidence.get('time', 'N/A')
+                        elif isinstance(evidence, str):
+                            # 从字符串中解析时间和来源信息
+                            import re
+                            desc = evidence
+                            # 提取时间信息
+                            time_match = re.search(r'Time:\s*([^,]+)', evidence)
+                            time = time_match.group(1).strip() if time_match else 'N/A'
+                            
+                            # 提取来源信息
+                            source_match = re.search(r'From Source:\s*(.+)$', evidence)
+                            source = source_match.group(1).strip() if source_match else 'N/A'
+                            
+                            # 从描述中移除时间和来源信息
+                            desc = re.sub(r'\s*Time:\s*[^,]+,?\s*From Source:.*$', '', desc)
+                        else:
+                            desc = str(evidence)
+                            source = 'N/A'
+                            time = 'N/A'
+                            
                         report_content += f"  {j}. **{desc}** (来源: {source}, 时间: {time})\n"
                 
                 # 风险提示

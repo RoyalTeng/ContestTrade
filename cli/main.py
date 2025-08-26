@@ -5,6 +5,7 @@ import asyncio
 import sys
 import json
 import re
+import time
 from pathlib import Path
 from typing import Optional, Dict
 from datetime import datetime
@@ -99,7 +100,7 @@ class ContestTradeDisplay:
                         files = list(agent_dir.glob(pattern))
                         if files and self.agent_status[agent_name] != "completed":
                             self.update_agent_status(agent_name, "completed")
-                            self.add_message("Data Analysis Agent", f"✅ {agent_name} 完成数据分析")
+                            self.add_message("Data Analysis Agent", f"[OK] {agent_name} 完成数据分析")
         
         # 检查reports目录（Research Agent结果）
         reports_dir = Path(PROJECT_ROOT) / "agents_workspace" / "reports"
@@ -113,21 +114,21 @@ class ContestTradeDisplay:
                         files = list(agent_dir.glob(pattern))
                         if files and self.agent_status[agent_name] != "completed":
                             self.update_agent_status(agent_name, "completed")
-                            self.add_message("Research Agent", f"✅ {agent_name} 完成研究分析")
+                            self.add_message("Research Agent", f"[OK] {agent_name} 完成研究分析")
     
     def start_data_agents(self):
         """开始所有Data Analysis Agent"""
         for agent_name in self.agent_status:
             if not agent_name.startswith("agent_"):  # Data agents
                 self.update_agent_status(agent_name, "running")
-        self.add_message("系统", "🚀 开始运行所有Data Analysis Agent")
+        self.add_message("系统", "[START] 开始运行所有Data Analysis Agent")
     
     def start_research_agents(self):
         """开始所有Research Agent"""
         for agent_name in self.agent_status:
             if agent_name.startswith("agent_"):  # Research agents
                 self.update_agent_status(agent_name, "running")
-        self.add_message("系统", "🚀 开始运行所有Research Agent")
+        self.add_message("系统", "[START] 开始运行所有Research Agent")
         
     def add_message(self, message_type: str, content: str):
         """添加消息"""
@@ -383,8 +384,8 @@ def run_contest_analysis_interactive(trigger_time: str):
         # 创建初始布局
         layout = display.create_layout(trigger_time)
         
-        # 使用Live界面运行 - 提高刷新频率以更好响应窗口大小变化
-        with Live(layout, refresh_per_second=4, screen=True, auto_refresh=True, console=console) as live:
+        # 使用Live界面运行 - 降低刷新频率避免闪烁
+        with Live(layout, refresh_per_second=1, screen=True, auto_refresh=True, console=console) as live:
             # 初始显示
             display.update_display(layout, trigger_time)
             
@@ -446,15 +447,15 @@ def run_contest_analysis_interactive(trigger_time: str):
                     display.update_display(layout, trigger_time)
                 
                 # 等待用户手动退出
-                console.print("\n[green]✅ 分析完成！[/green]")
+                console.print("\n[green][OK] 分析完成！[/green]")
                 console.print("[dim]按任意键退出运行界面...[/dim]")
                 input()
                 
             else:
-                display.add_message("错误", "❌ 分析失败")
+                display.add_message("错误", "[FAIL] 分析失败")
                 display.set_current_task("分析失败")
                 display.update_display(layout, trigger_time)
-                console.print("\n[red]❌ 分析失败！[/red]")
+                console.print("\n[red][FAIL] 分析失败！[/red]")
                 console.print("[dim]按任意键退出运行界面...[/dim]")
                 input()
                 return None, display
@@ -473,8 +474,8 @@ def run_contest_analysis_interactive(trigger_time: str):
 async def run_with_events_capture(company, trigger_time: str, display: ContestTradeDisplay, layout, live):
     """运行公司工作流并捕获事件流"""
     try:
-        display.add_message("开始", "🚀 开始运行工作流...")
-        display.set_current_task("🔄 启动工作流...")
+        display.add_message("开始", "[START] 开始运行工作流...")
+        display.set_current_task("[INIT] 启动工作流...")
         display.create_log_file(trigger_time)
         display.update_display(layout, trigger_time)
         
@@ -492,7 +493,7 @@ async def run_with_events_capture(company, trigger_time: str, display: ContestTr
                 else:
                     display.update_display(layout, trigger_time)
                     
-                await asyncio.sleep(1)  # 每1秒检查一次，提高响应性
+                await asyncio.sleep(2)  # 每2秒检查一次，减少不必要的刷新
         
         # 启动状态检查任务
         status_check_task = asyncio.create_task(periodic_status_check())
@@ -500,72 +501,72 @@ async def run_with_events_capture(company, trigger_time: str, display: ContestTr
         # 运行公司工作流并处理事件
         final_state = None
         async for event in company.run_company_with_events(trigger_time):
-            event_name = event.get("name", "")
-            event_type = event.get("event", "")
-            event_data = event.get("data", {})
+                event_name = event.get("name", "")
+                event_type = event.get("event", "")
+                event_data = event.get("data", {})
             
-            # 记录重要事件到日志
-            if event_type in ["on_chain_start", "on_chain_end"]:
-                log_msg = f"[{datetime.now().strftime('%H:%M:%S')}] {event_type}: {event_name}\n"
-                with open(display.log_file, "a", encoding="utf-8") as f:
-                    f.write(log_msg)
-                # # 同时显示到界面事件流
-                # display.add_message("事件", f"{event_type}: {event_name}")
-            
-            # 记录自定义事件到日志和界面
-            if event_type == "on_custom":
-                custom_event_name = event_name
-                custom_data = event_data
-                log_msg = f"[{datetime.now().strftime('%H:%M:%S')}] CUSTOM: {custom_event_name} - {custom_data}\n"
-                with open(display.log_file, "a", encoding="utf-8") as f:
-                    f.write(log_msg)
-                # 显示到界面
-                display.add_message("自定义事件", f"{custom_event_name}")
-            
-            # 处理stdout输出（记录到日志和界面）
-            if event_type == "on_stdout":
-                stdout_content = event_data.get("chunk", "")
-                if stdout_content.strip():
-                    log_msg = f"[{datetime.now().strftime('%H:%M:%S')}] STDOUT: {stdout_content.strip()}\n"
+                # 记录重要事件到日志
+                if event_type in ["on_chain_start", "on_chain_end"]:
+                    log_msg = f"[{datetime.now().strftime('%H:%M:%S')}] {event_type}: {event_name}\n"
                     with open(display.log_file, "a", encoding="utf-8") as f:
                         f.write(log_msg)
-                    # 显示所有stdout到界面
-                    display.add_message("输出", stdout_content.strip())
+                    # # 同时显示到界面事件流
+                    # display.add_message("事件", f"{event_type}: {event_name}")
             
-            # 处理关键阶段事件
-            if event_type == "on_chain_start":
-                stage_config = {
-                    "run_data_agents": {
-                        "action": display.start_data_agents,
-                        "task": "🔄 Data Analysis Agent 数据收集阶段",
-                        "progress": "数据收集阶段 1/4"
-                    },
-                    "run_research_agents": {
-                        "action": display.start_research_agents,
-                        "task": "🔄 Research Agent 研究分析阶段", 
-                        "progress": "研究分析阶段 2/4"
-                    },
-                    "run_contest": {
-                        "action": lambda: None,
-                        "task": "🔄 竞赛评选阶段",
-                        "progress": "竞赛评选阶段 3/4"
-                    },
-                    "finalize": {
-                        "action": lambda: None,
-                        "task": "🔄 结果生成阶段",
-                        "progress": "结果生成阶段 4/4"
+                # 记录自定义事件到日志和界面
+                if event_type == "on_custom":
+                    custom_event_name = event_name
+                    custom_data = event_data
+                    log_msg = f"[{datetime.now().strftime('%H:%M:%S')}] CUSTOM: {custom_event_name} - {custom_data}\n"
+                    with open(display.log_file, "a", encoding="utf-8") as f:
+                        f.write(log_msg)
+                    # 显示到界面
+                    display.add_message("自定义事件", f"{custom_event_name}")
+            
+                # 处理stdout输出（记录到日志和界面）
+                if event_type == "on_stdout":
+                    stdout_content = event_data.get("chunk", "")
+                    if stdout_content.strip():
+                        log_msg = f"[{datetime.now().strftime('%H:%M:%S')}] STDOUT: {stdout_content.strip()}\n"
+                        with open(display.log_file, "a", encoding="utf-8") as f:
+                            f.write(log_msg)
+                        # 显示所有stdout到界面
+                        display.add_message("输出", stdout_content.strip())
+            
+                # 处理关键阶段事件
+                if event_type == "on_chain_start":
+                    stage_config = {
+                        "run_data_agents": {
+                            "action": display.start_data_agents,
+                            "task": "🔄 Data Analysis Agent 数据收集阶段",
+                            "progress": "数据收集阶段 1/4"
+                        },
+                        "run_research_agents": {
+                            "action": display.start_research_agents,
+                            "task": "🔄 Research Agent 研究分析阶段", 
+                            "progress": "研究分析阶段 2/4"
+                        },
+                        "run_contest": {
+                            "action": lambda: None,
+                            "task": "🔄 竞赛评选阶段",
+                            "progress": "竞赛评选阶段 3/4"
+                        },
+                        "finalize": {
+                            "action": lambda: None,
+                            "task": "🔄 结果生成阶段",
+                            "progress": "结果生成阶段 4/4"
+                        }
                     }
-                }
-                
-                if event_name in stage_config:
-                    config = stage_config[event_name]
-                    config["action"]()
-                    display.set_current_task(config["task"])
-                    display.set_progress_info(config["progress"])
+                    
+                    if event_name in stage_config:
+                        config = stage_config[event_name]
+                        config["action"]()
+                        display.set_current_task(config["task"])
+                        display.set_progress_info(config["progress"])
             
-            # 处理完成事件
-            elif event_type == "on_chain_end":
-                completion_config = {
+                # 处理完成事件
+                elif event_type == "on_chain_end":
+                    completion_config = {
                     "run_data_agents": {
                         "task": "✅ Data Analysis Agent 完成",
                         "message": "✅ 所有Data Analysis Agent完成"
@@ -583,36 +584,36 @@ async def run_with_events_capture(company, trigger_time: str, display: ContestTr
                         "message": None,
                         "special": True
                     }
-                }
-                
-                if event_name in completion_config:
-                    config = completion_config[event_name]
-                    display.set_current_task(config["task"])
-                    if config.get("message"):
-                        display.add_message("系统", config["message"])
+                    }
                     
-                    if config.get("special"):  # finalize阶段的特殊处理
-                        final_state = event_data.get("output", {})
-                        if 'trigger_time' not in final_state:
-                            final_state['trigger_time'] = trigger_time
-                        display.set_analysis_completed(True)
+                    if event_name in completion_config:
+                        config = completion_config[event_name]
+                        display.set_current_task(config["task"])
+                        if config.get("message"):
+                            display.add_message("系统", config["message"])
+                        
+                        if config.get("special"):  # finalize阶段的特殊处理
+                            final_state = event_data.get("output", {})
+                            if 'trigger_time' not in final_state:
+                                final_state['trigger_time'] = trigger_time
+                            display.set_analysis_completed(True)
             
-            # 处理具体的节点事件（用于步骤统计）
-            if event_type == "on_chain_start":
-                step_mapping = {
-                    "data": ["init_factor", "recompute_factor", "submit_result", "preprocess", "batch_process", "final_summary"],
-                    "research": ["init_signal", "recompute_signal", "init_data", "plan", "tool_selection", "call_tool", "write_result"],
-                    "contest": ["run_contest", "run_judger_critic"],
-                    "finalize": ["finalize"]
-                }
-                
-                for step_type, keywords in step_mapping.items():
-                    if any(keyword in event_name.lower() for keyword in keywords):
-                        display.step_counts[step_type] += 1
-                        break
+                # 处理具体的节点事件（用于步骤统计）
+                if event_type == "on_chain_start":
+                    step_mapping = {
+                        "data": ["init_factor", "recompute_factor", "submit_result", "preprocess", "batch_process", "final_summary"],
+                        "research": ["init_signal", "recompute_signal", "init_data", "plan", "tool_selection", "call_tool", "write_result"],
+                        "contest": ["run_contest", "run_judger_critic"],
+                        "finalize": ["finalize"]
+                    }
+                    
+                    for step_type, keywords in step_mapping.items():
+                        if any(keyword in event_name.lower() for keyword in keywords):
+                            display.step_counts[step_type] += 1
+                            break
             
-            # 更新显示 - 由于启用了自动刷新，不需要手动refresh
-            display.update_display(layout, trigger_time)
+                # 更新显示
+                display.update_display(layout, trigger_time)
         
         # 停止状态检查任务并设置最终状态
         if 'status_check_task' in locals():
@@ -641,14 +642,14 @@ async def run_with_events_capture(company, trigger_time: str, display: ContestTr
             except asyncio.CancelledError:
                 pass
         
-        display.add_message("错误", f"❌ 运行失败: {str(e)}")
+        display.add_message("错误", f"[ERROR] 运行失败: {str(e)}")
         console.print(f"[red]详细错误: {e}[/red]")
         return None
 
 
 def ask_user_for_next_action(final_state):
     """询问用户下一步操作"""
-    console.print("\n[green]✅ 分析完成！[/green]")
+    console.print("\n[green][OK] 分析完成！[/green]")
     console.print("[dim]输入 'rr' 查看研究报告 | 'dr' 查看数据报告 | 'n' 运行新分析 | 'q' 退出[/dim]")
     
     while True:
