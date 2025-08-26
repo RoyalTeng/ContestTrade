@@ -3,39 +3,39 @@
 
 # 可选：Tushare 数据接口密钥（用于获取更丰富的金融数据）
 # 获取地址：https://tushare.pro/
-tushare_key: "" 
+tushare_key: "your_tushare_key_here" 
 
 # 可选：Bocha 搜索引擎密钥
 # 获取地址：https://bocha.io/
-bocha_key: "" 
+bocha_key: "your_bocha_key_here" 
 
 # 可选：SerpAPI 搜索引擎密钥
 # 获取地址：https://serpapi.com/
-serp_key: "" 
+serp_key: "your_serp_key_here" 
 
 # 可选：FMP 金融数据密钥
-fmp_key: "" 
+fmp_key: "your_fmp_key_here" 
 
 # 可选：Finnhub 金融数据密钥
-finnhub_key: "" 
+finnhub_key: "your_finnhub_key_here" 
 
 # 必需：LLM API 配置（用于通用任务）
 # 推荐使用 DeepSeek API
 llm:
   base_url: "https://api.deepseek.com"
-  api_key: ""  # 必需：请填入您的 DeepSeek API Key
+  api_key: "your_deepseek_api_key_here"  # 必需：请填入您的 DeepSeek API Key
   model_name: "deepseek-chat"
 
 # 可选：用于复杂推理的 LLM API
 llm_thinking:
   base_url: "https://api.deepseek.com"
-  api_key: ""  # 可选：可以使用与上面相同的 API Key
+  api_key: "your_deepseek_api_key_here"  # 可选：可以使用与上面相同的 API Key
   model_name: "deepseek-reasoner"
 
 # 可选：用于视觉分析的 VLM API
 vlm:
   base_url: "https://api.stepfun.com/v1"
-  api_key: ""  # 可选：StepFun API Key
+  api_key: "your_stepfun_api_key_here"  # 可选：StepFun API Key
   model_name: "step-1o-turbo-vision"
 
 # 数据智能体配置（使用 AKShare 数据源）
