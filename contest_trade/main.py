@@ -66,7 +66,7 @@ class SimpleTradeCompany:
         """运行Data Agents步骤"""
         trigger_time = state["trigger_time"]
         
-        print("🚀 开始并发运行Data Agents...")
+        print("开始并发运行Data Agents...")
         
         # 创建并发任务
         agent_tasks = []
@@ -105,7 +105,7 @@ class SimpleTradeCompany:
         trigger_time = state["trigger_time"]
         data_factors = state["data_factors"]
         
-        print("🚀 开始并发运行Research Agents...")
+        print("开始并发运行Research Agents...")
         
         # 创建并发任务
         agent_tasks = []
@@ -199,7 +199,7 @@ class SimpleTradeCompany:
         judger_scores = state["judger_scores"]
         optimized_weights = state["optimized_weights"]
         
-        print("🚀 开始运行竞赛步骤...")
+        print("开始运行竞赛步骤...")
         
         # 基于权重选择最佳信号
         if optimized_weights:
@@ -238,7 +238,7 @@ class SimpleTradeCompany:
         all_events = state["all_events"]
         step_results = state["step_results"]
         
-        print("🚀 开始最终结果步骤...")
+        print("开始最终结果步骤...")
         
         # 获取最佳信号
         best_signals = step_results.get("contest", {}).get("best_signals", [])
@@ -262,7 +262,7 @@ class SimpleTradeCompany:
     # 辅助函数
     async def _run_single_data_agent(self, agent_id: int, agent, trigger_time: str, config: RunnableConfig):
         """运行单个data agent"""
-        print(f"🔍 开始运行Data Agent {agent_id} ({agent.config.agent_name})...")
+        print(f"开始运行Data Agent {agent_id} ({agent.config.agent_name})...")
         
         agent_input = DataAnalysisAgentInput(trigger_time=trigger_time)
         agent_events = []
@@ -298,7 +298,7 @@ class SimpleTradeCompany:
 
     async def _run_single_research_agent(self, agent_id: int, agent, trigger_time: str, factors: List, config: RunnableConfig):
         """运行单个research agent"""
-        print(f"🔍 开始运行Research Agent {agent_id} ({agent.config.agent_name})...")
+        print(f"开始运行Research Agent {agent_id} ({agent.config.agent_name})...")
         
         # 构建背景信息
         background_information = agent.build_background_information(trigger_time, agent.config.belief, factors)
@@ -458,7 +458,7 @@ class SimpleTradeCompany:
 
     async def run_company(self, trigger_time: str, config: RunnableConfig = None):
         """运行整个公司流程"""
-        print("🚀 开始运行Simplified TradeCompany...")
+        print("开始运行Simplified TradeCompany...")
         
         if config is None:
             config = RunnableConfig(recursion_limit=50)
@@ -523,7 +523,7 @@ if __name__ == "__main__":
         company = SimpleTradeCompany()
         
         # 使用事件流运行
-        print("🚀 开始测试Simplified TradeCompany事件流...")
+        print("开始测试Simplified TradeCompany事件流...")
         print("=" * 60)
 
         trigger_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -555,7 +555,7 @@ if __name__ == "__main__":
                     print(f"📊 Data Agent {agent_id}: {custom_name}")
                 elif custom_name.startswith("research_agent_"):
                     agent_id = custom_data.get("agent_id", "unknown")
-                    print(f"🔍 Research Agent {agent_id}: {custom_name}")
+                    print(f"Research Agent {agent_id}: {custom_name}")
                 else:
                     print(f"🎯 自定义事件: {custom_name}")
         

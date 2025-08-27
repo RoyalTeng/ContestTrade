@@ -414,13 +414,13 @@ class ResearchAgent:
             final_result_thinking="",
             result=None
         )
-        print(f"🚀 Research Agent Starting - {input.trigger_time}")
+        print(f"Research Agent Starting - {input.trigger_time}")
         async for event in self.app.astream_events(initial_state, version="v2", config=config or RunnableConfig(recursion_limit=50)):
             yield event
 
     async def run_with_monitoring(self, input: ResearchAgentInput) -> ResearchAgentOutput:
         """使用事件流监控运行Agent"""
-        print(f"🚀 Research Agent Starting - {input.trigger_time}")
+        print(f"Research Agent Starting - {input.trigger_time}")
         final_result = None
         async for event in self.run_with_monitoring_events(input, RunnableConfig(recursion_limit=50)):
             event_type = event["event"]

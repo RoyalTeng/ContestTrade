@@ -234,10 +234,10 @@ class ContestTradeDisplay:
             status_text.append("📊 Data Analysis Agent\n", style="bold cyan")
             for agent_name, status in data_agents.items():
                 status_icon = {
-                    "pending": "⏳等待中...",
-                    "running": "🔄分析中...", 
-                    "completed": "✅分析完成"
-                }.get(status, "❓")
+                    "pending": "等待中...",
+                    "running": "分析中...", 
+                    "completed": "分析完成"
+                }.get(status, "N/A")
                 
                 agent_display = agent_name[:20].ljust(20)
                 status_text.append(f"{agent_display} {status_icon}\n")
@@ -245,20 +245,20 @@ class ContestTradeDisplay:
         # Research Agent状态
         research_agents = {k: v for k, v in self.agent_status.items() if k.startswith("agent_")}
         if research_agents:
-            status_text.append("\n🔍 Research Agent\n", style="bold green")
+            status_text.append("\nResearch Agent\n", style="bold green")
             for agent_name, status in research_agents.items():
                 status_icon = {
-                    "pending": "⏳等待中...",
-                    "running": "🔄分析中...", 
-                    "completed": "✅分析完成"
-                }.get(status, "❓")
+                    "pending": "等待中...",
+                    "running": "分析中...", 
+                    "completed": "分析完成"
+                }.get(status, "N/A")
                 
                 agent_display = agent_name[:20].ljust(20)
                 status_text.append(f"{agent_display} {status_icon}\n")
         
         status_panel = Panel(
             status_text,
-            title="🤖 Agent状态",
+            title="Agent状态",
             border_style="yellow",
             padding=(0, 1),
             expand=True  # 自适应宽度
@@ -923,7 +923,7 @@ def run(
             break
         
         if result is None or (isinstance(result, tuple) and result[0] is None):
-            console.print("[red]❌ 分析失败[/red]")
+            console.print("[red]分析失败[/red]")
             break
             
         if isinstance(result, tuple):

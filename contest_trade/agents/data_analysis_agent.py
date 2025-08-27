@@ -574,7 +574,7 @@ class DataAnalysisAgent:
             result=None
         )
         
-        print(f"🚀 Data Analysis Agent Starting - {input.trigger_time}")
+        print(f"Data Analysis Agent Starting - {input.trigger_time}")
         
         # 返回事件流
         async for event in self.app.astream_events(initial_state, version="v2", config=config or RunnableConfig(recursion_limit=50)):

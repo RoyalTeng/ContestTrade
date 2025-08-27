@@ -35,7 +35,7 @@ def get_trigger_time() -> str:
 def validate_tushare_connection():
     """验证Tushare连接"""
     try:
-        console.print("🔍 [cyan]正在验证Tushare配置...[/cyan]")
+        console.print("[cyan]正在验证Tushare配置...[/cyan]")
         ts.set_token(cfg.tushare_key)
         pro = ts.pro_api(cfg.tushare_key, timeout=3)
         end_date = datetime.now().strftime('%Y%m%d')
@@ -43,37 +43,37 @@ def validate_tushare_connection():
         trade_cal = pro.trade_cal(exchange='SSE', start_date=start_date, end_date=end_date, timeout=1)
         print(trade_cal)
         if trade_cal is not None and len(trade_cal) > 0:
-            console.print(f"✅ [green]Tushare连接成功[/green]")
+            console.print(f"[green]Tushare连接成功[/green]")
             return True
         else:
-            console.print("❌ [red]Tushare连接失败 - 未获取到数据[/red]")
+            console.print("[red]Tushare连接失败 - 未获取到数据[/red]")
             return False
     except Exception as e:
-        console.print(f"❌ [red]Tushare连接失败: {str(e)}[/red]")
+        console.print(f"[red]Tushare连接失败: {str(e)}[/red]")
         return False
 
 def validate_llm_connection():
     """验证LLM连接"""
     try:
-        console.print("🔍 [cyan]正在验证LLM配置...[/cyan]")
+        console.print("[cyan]正在验证LLM配置...[/cyan]")
         test_messages = [
             {"role": "user", "content": "请回复'连接测试成功'，不要添加任何其他内容。"}
         ]
         result = GLOBAL_LLM.run(test_messages, max_tokens=1, temperature=0.1, max_retries=0)
         if result and hasattr(result, 'content') and result.content:
-            console.print(f"✅ [green]LLM连接成功[/green] - 模型: {GLOBAL_LLM.model_name}")
+            console.print(f"[green]LLM连接成功[/green] - 模型: {GLOBAL_LLM.model_name}")
             return True
         else:
-            console.print("❌ [red]LLM连接失败 - 无响应内容[/red]")
+            console.print("[red]LLM连接失败 - 无响应内容[/red]")
             return False
     except Exception as e:
-        console.print(f"❌ [red]LLM连接失败: {str(e)}[/red]")
+        console.print(f"[red]LLM连接失败: {str(e)}[/red]")
         return False
 
 def validate_required_services():
     """根据配置文件中的tushare_key自动决定验证策略"""
     console.print("\n" + "="*50)
-    console.print("🔧 [bold blue]正在验证必要系统配置...[/bold blue]")
+    console.print("[bold blue]正在验证必要系统配置...[/bold blue]")
     console.print("="*50)
     all_valid = True
     
@@ -82,19 +82,19 @@ def validate_required_services():
     has_tushare_key = tushare_key and tushare_key.strip() and tushare_key != "YOUR_TUSHARE_KEY"
     
     if has_tushare_key:
-        console.print("🔍 [cyan]检测到Tushare密钥，将验证Tushare连接...[/cyan]")
+        console.print("[cyan]检测到Tushare密钥，将验证Tushare连接...[/cyan]")
         # 验证Tushare
         if not validate_tushare_connection():
             all_valid = False
     else:
-        console.print("ℹ️  [yellow]未检测到Tushare密钥，跳过Tushare验证[/yellow]")
+        console.print("[yellow]未检测到Tushare密钥，跳过Tushare验证[/yellow]")
 
         # 验证akshare是否安装
         try:
             import akshare
-            console.print("✅ [green]akshare已安装[/green]")
+            console.print("[green]akshare已安装[/green]")
         except ImportError:
-            console.print("❌ [red]akshare未安装，请重新执行pip install akshare[/red]")
+            console.print("[red]akshare未安装，请重新执行pip install akshare[/red]")
             all_valid = False
     
     # 始终验证LLM
@@ -105,13 +105,13 @@ def validate_required_services():
     
     if all_valid:
         if has_tushare_key:
-            console.print("🎉 [bold green]所有必要系统配置验证通过（包含Tushare），系统准备就绪！[/bold green]")
+            console.print("[bold green]所有必要系统配置验证通过（包含Tushare），系统准备就绪！[/bold green]")
         else:
-            console.print("🎉 [bold green]所有必要系统配置验证通过（不含Tushare），系统准备就绪！[/bold green]")
+            console.print("[bold green]所有必要系统配置验证通过（不含Tushare），系统准备就绪！[/bold green]")
         console.print("="*50 + "\n")
         return True
     else:
-        console.print("⚠️  [bold red]必要系统配置验证失败，请检查配置文件[/bold red]")
+        console.print("[bold red]必要系统配置验证失败，请检查配置文件[/bold red]")
         console.print("="*50 + "\n")
         return False
 
