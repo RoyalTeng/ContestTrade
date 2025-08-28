@@ -214,6 +214,9 @@ contest_trade/factors/raw_data/
 contest_trade/signals/
 contest_trade/agents_workspace/
 nohup.out
+
+# Configuration files with sensitive information
+config.yaml
 __pycached__
 */__pycached__
 __pycache__
