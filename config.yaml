@@ -23,19 +23,19 @@ finnhub_key: ""
 # 推荐使用 DeepSeek API
 llm:
   base_url: "https://api.deepseek.com"
-  api_key: "sk-46fd5137f830427a916c9c439d87df0b"
+  api_key: ""  # 请填入您的 DeepSeek API Key
   model_name: "deepseek-chat"
 
 # 可选：用于复杂推理的 LLM API
 llm_thinking:
   base_url: "https://api.deepseek.com"
-  api_key: "sk-46fd5137f830427a916c9c439d87df0b"
+  api_key: ""  # 请填入您的 DeepSeek API Key
   model_name: "deepseek-reasoner"
 
 # 可选：用于视觉分析的 VLM API
 vlm:
   base_url: "https://api.deepseek.com"
-  api_key: "sk-46fd5137f830427a916c9c439d87df0b"
+  api_key: ""  # 请填入您的 DeepSeek API Key
   model_name: "deepseek-chat"
 
 # 数据智能体配置（使用 AKShare 数据源）
